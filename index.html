@@ -1,23 +1,106 @@
-<h1>Yalla Match</h1>
-<p>Firebase Connected</p>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>Yalla Match</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCimngs2OSYeT_-bakPP0Zer5I6CpnTTJE",
-    authDomain: "yalla-191b9.firebaseapp.com",
-    projectId: "yalla-191b9",
-    storageBucket: "yalla-191b9.firebasestorage.app",
-    messagingSenderId: "102780735540",
-    appId: "1:102780735540:web:4f1f5fde909484f30b7a61"
-  };
+    // 🔐 Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCimngs20SYEt_-bakPPQZerSI6CpnTTJE",
+      authDomain: "yalla-191b9.firebaseapp.com",
+      projectId: "yalla-191b9",
+      storageBucket: "yalla-191b9.appspot.com",
+      messagingSenderId: "102780735540",
+      appId: "1:102780735540:web:4f1f5fde909484f30b7a61"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    // Initialize
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  console.log("Firebase connected ✅");
-</script>
+    console.log("Firebase connected ✅");
+
+    // ✅ Register
+    window.register = async (email, password, name) => {
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+        await setDoc(doc(db, "users", userCred.user.uid), {
+          name: name,
+          email: email,
+          createdAt: new Date()
+        });
+
+        alert("تم إنشاء الحساب بنجاح ✅");
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+
+    // ✅ Login
+    window.login = async (email, password) => {
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("تم تسجيل الدخول بنجاح ✅");
+      } catch (error) {
+        alert(error.message);
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    input, button {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      background: #16a34a;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Yalla Match</h1>
+
+  <h3>إنشاء حساب</h3>
+  <input id="r-name" placeholder="الاسم">
+  <input id="r-email" placeholder="الإيميل">
+  <input id="r-pass" type="password" placeholder="كلمة المرور">
+  <button onclick="register(
+    document.getElementById('r-email').value,
+    document.getElementById('r-pass').value,
+    document.getElementById('r-name').value
+  )">تسجيل</button>
+
+  <hr>
+
+  <h3>تسجيل دخول</h3>
+  <input id="l-email" placeholder="الإيميل">
+  <input id="l-pass" type="password" placeholder="كلمة المرور">
+  <button onclick="login(
+    document.getElementById('l-email').value,
+    document.getElementById('l-pass').value
+  )">دخول</button>
+
+</body>
+</html>
