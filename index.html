@@ -1,106 +1,146 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Yalla Match</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-
-    // 🔐 Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCimngs20SYEt_-bakPPQZerSI6CpnTTJE",
-      authDomain: "yalla-191b9.firebaseapp.com",
-      projectId: "yalla-191b9",
-      storageBucket: "yalla-191b9.appspot.com",
-      messagingSenderId: "102780735540",
-      appId: "1:102780735540:web:4f1f5fde909484f30b7a61"
-    };
-
-    // Initialize
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    console.log("Firebase connected ✅");
-
-    // ✅ Register
-    window.register = async (email, password, name) => {
-      try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-
-        await setDoc(doc(db, "users", userCred.user.uid), {
-          name: name,
-          email: email,
-          createdAt: new Date()
-        });
-
-        alert("تم إنشاء الحساب بنجاح ✅");
-      } catch (error) {
-        alert(error.message);
-      }
-    };
-
-    // ✅ Login
-    window.login = async (email, password) => {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("تم تسجيل الدخول بنجاح ✅");
-      } catch (error) {
-        alert(error.message);
-      }
-    };
-  </script>
 
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      direction: rtl;
     }
-    input, button {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
+
+    .app {
       width: 100%;
-      max-width: 300px;
+      max-width: 420px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      margin-top: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
     button {
-      background: #16a34a;
-      color: white;
+      width: 100%;
+      padding: 14px;
+      background: #2ecc71;
       border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 16px;
       cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .msg {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 14px;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>Yalla Match</h1>
+  <div class="app">
+    <h1>Yalla Match</h1>
 
-  <h3>إنشاء حساب</h3>
-  <input id="r-name" placeholder="الاسم">
-  <input id="r-email" placeholder="الإيميل">
-  <input id="r-pass" type="password" placeholder="كلمة المرور">
-  <button onclick="register(
-    document.getElementById('r-email').value,
-    document.getElementById('r-pass').value,
-    document.getElementById('r-name').value
-  )">تسجيل</button>
+    <!-- إنشاء حساب -->
+    <h3>إنشاء حساب</h3>
+    <input type="text" id="name" placeholder="الاسم">
+    <input type="email" id="signupEmail" placeholder="الإيميل">
+    <input type="password" id="signupPassword" placeholder="كلمة المرور">
+    <button onclick="signUp()">تسجيل</button>
 
-  <hr>
+    <!-- تسجيل دخول -->
+    <h3>تسجيل دخول</h3>
+    <input type="email" id="loginEmail" placeholder="الإيميل">
+    <input type="password" id="loginPassword" placeholder="كلمة المرور">
+    <button onclick="login()">دخول</button>
 
-  <h3>تسجيل دخول</h3>
-  <input id="l-email" placeholder="الإيميل">
-  <input id="l-pass" type="password" placeholder="كلمة المرور">
-  <button onclick="login(
-    document.getElementById('l-email').value,
-    document.getElementById('l-pass').value
-  )">دخول</button>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } 
+      from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } 
+      from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCimngs2OSYeT_-bakPP0Zer5I6CpnTTJE",
+      authDomain: "yalla-191b9.firebaseapp.com",
+      projectId: "yalla-191b9",
+      storageBucket: "yalla-191b9.firebasestorage.app",
+      messagingSenderId: "102780735540",
+      appId: "1:102780735540:web:4f1f5fde909484f30b7a61"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.signUp = async function () {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      const msg = document.getElementById("msg");
+
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, "users", userCred.user.uid), {
+          name: name,
+          email: email
+        });
+        msg.innerText = "✅ تم إنشاء الحساب بنجاح";
+      } catch (e) {
+        msg.innerText = "❌ " + e.message;
+      }
+    };
+
+    window.login = async function () {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+      const msg = document.getElementById("msg");
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        msg.innerText = "✅ تم تسجيل الدخول";
+      } catch (e) {
+        msg.innerText = "❌ " + e.message;
+      }
+    };
+  </script>
 
 </body>
 </html>
